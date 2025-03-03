@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-flask-app-service
+spec:
+  selector:
+    app: demo-flask-app
+  ports:
+    - protocol: TCP
+      port: 80      # Expose externally on port 80
+      targetPort: 3000  # Inside the container, Flask runs on port 3000
+  type: NodePort

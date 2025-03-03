@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-flask-app
+  labels:
+    app: demo-flask-app
+spec:
+  replicas: 2  # Run 2 instances of Flask
+  selector:
+    matchLabels:
+      app: demo-flask-app
+  template:
+    metadata:
+      labels:
+        app: demo-flask-app
+    spec:
+      containers:
+        - name: demo-flask-app
+          image: rajeshgoyalg/demo-flask-app:latest
+          ports:
+            - containerPort: 3000
