@@ -13,11 +13,13 @@ This repository contains Kubernetes configuration files to deploy the sample Fla
 ```
 demo-kubernetes-configs/
 ├── demo-flask-app/
-│   ├── deployment.yaml         # App Deployment manifest
-│   ├── service.yaml           # Service (NodePort) manifest
-│   ├── ingress.yaml           # Ingress for AWS EKS (ALB)
-│   ├── aks_ingress.yaml       # Ingress for Azure AKS (NGINX)
-│   └── gke_ingress.yaml       # Ingress for Google GKE (GCE)
+│   ├── deployment.yaml        # App Deployment manifest
+│   ├── service_aks.yaml       # Service (ClusterIP) manifest
+│   ├── service_eks.yaml       # Service (NodePort) manifest
+│   ├── service_gke.yaml       # Service (NodePort) manifest
+│   ├── ingress_eks.yaml       # Ingress for AWS EKS (ALB)
+│   ├── ingress_aks.yaml       # Ingress for Azure AKS (NGINX)
+│   └── ingress_gke.yaml       # Ingress for Google GKE (GCE)
 └── README.md                  # (This file)
 ```
 
@@ -55,21 +57,30 @@ Apply the manifests in the following order:
    kubectl apply -f deployment.yaml
    ```
 2. **Service:**
+  - For AWS EKS (ALB):
    ```sh
-   kubectl apply -f service.yaml
+   kubectl apply -f service_eks.yaml
+   ```
+  - For Azure AKS (NGINX):
+   ```sh
+   kubectl apply -f service_aks.yaml
+   ```
+  - For Google GKE (GCE):
+   ```sh
+   kubectl apply -f service_gke.yaml
    ```
 3. **Ingress:**
    - For AWS EKS (ALB):
      ```sh
-     kubectl apply -f ingress.yaml
+     kubectl apply -f ingress_eks.yaml
      ```
    - For Azure AKS (NGINX):
      ```sh
-     kubectl apply -f aks_ingress.yaml
+     kubectl apply -f ingress_aks.yaml
      ```
    - For Google GKE (GCE):
      ```sh
-     kubectl apply -f gke_ingress.yaml
+     kubectl apply -f ingress_gke.yaml
      ```
 
 ---
@@ -81,15 +92,15 @@ Apply the manifests in the following order:
   - Sets resource requests/limits for efficient scheduling.
 
 - **service.yaml:**
-  - Exposes the deployment using a `NodePort` service on port 80 (mapped to container port 3000).
+  - Exposes the deployment using a `NodePort` / `ClusterIP` service on port 80 (mapped to container port 3000).
 
-- **ingress.yaml:**
+- **ingress_eks.yaml:**
   - AWS EKS ingress using ALB (`alb` class), with annotations for internet-facing access and group management.
 
-- **aks_ingress.yaml:**
+- **ingress_aks.yaml:**
   - Azure AKS ingress using the `nginx` class.
 
-- **gke_ingress.yaml:**
+- **ingress_gke.yaml:**
   - Google GKE ingress using the `gce` class for HTTP Load Balancer.
 
 ---
@@ -97,30 +108,18 @@ Apply the manifests in the following order:
 ## Ingress Configuration by Cloud Provider
 
 - **AWS EKS:**
-  - Uses AWS ALB Ingress Controller (see `ingress.yaml`).
+  - Uses AWS ALB Ingress Controller (see `ingress_eks.yaml`).
   - Requires ALB controller installed and IAM permissions.
   - DNS/URL assigned by AWS ALB after creation.
 
 - **Azure AKS:**
-  - Uses NGINX Ingress Controller (see `aks_ingress.yaml`).
+  - Uses NGINX Ingress Controller (see `ingress_aks.yaml`).
   - Requires NGINX controller installed in the cluster.
   - External IP assigned to ingress service.
 
 - **Google GKE:**
-  - Uses GCE HTTP Load Balancer (see `gke_ingress.yaml`).
+  - Uses GCE HTTP Load Balancer (see `ingress_gke.yaml`).
   - External IP assigned by GCP after ingress creation.
-
----
-
-## Notes on Domain Mapping & LoadBalancer
-
-- Ingress controllers provision external endpoints (DNS or IP) for public access.
-- To use a custom domain, create a DNS A/CNAME record pointing to the assigned IP or DNS name.
-- For local testing (e.g., Docker Desktop), you may port-forward the service:
-  ```sh
-  kubectl port-forward service/demo-flask-app-service 3000:80
-  ```
-  Then access: http://localhost:3000
 
 ---
 
@@ -135,7 +134,3 @@ Apply the manifests in the following order:
 ## Contribution & License
 
 Contributions are welcome! Please open issues or submit PRs for improvements or new cloud provider support.
-
-This project is licensed under the [MIT License](LICENSE).
- demo-kubernetes-configs
-demo-kubernetes-configs
